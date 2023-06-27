@@ -1,0 +1,34 @@
+package repository
+
+import (
+	"context"
+
+	"github.com/jmoiron/sqlx"
+	"github.com/nathanmartinezc/go-inventory/internal/entity"
+)
+
+// Repository is tyhe interface that wraps the basci CRUD operations
+//
+//go:generate mockery --name=Repository --output=repository --inpackage
+type Repository interface {
+	SaveUser(ctx context.Context, email, name, password string) error
+	GetUserByEmail(ctx context.Context, email string) (*entity.User, error)
+
+	SaveUserRole(ctx context.Context, userID, roleID int64) error
+	RemoveUserRole(ctx context.Context, userID, roleID int64) error
+	GetUserRoles(ctx context.Context, userID int64) ([]entity.UserRole, error)
+
+	SaveProduct(ctx context.Context, name, description string, price float32, createdBy int64) error
+	GetProducts(ctx context.Context) ([]entity.Product, error)
+	GetProduct(ctx context.Context, id int64) (*entity.Product, error)
+}
+
+type repo struct {
+	db *sqlx.DB
+}
+
+func New(db *sqlx.DB) Repository {
+	return &repo{
+		db: db,
+	}
+}
